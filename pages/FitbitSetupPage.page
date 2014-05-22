@@ -1,0 +1,57 @@
+<apex:page tabStyle="My_Fitbit_Profile__tab" showHeader="true" docType="html-5.0" controller="FitbitSetupController" action="{!completeAuthorizationPage}">  
+  <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"/>
+  <apex:includeScript value="{!URLFOR($Resource.VisualStrap_Resources, 'js/bootstrap.min.js')}" />
+  <apex:stylesheet value="{!URLFOR($Resource.VisualStrap_Resources, 'css/visualstrap.css')}" />
+   <style>  
+     body{  
+         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;  
+       }  
+     .intro{  
+       margin-top:20px;  
+       font-size:140%;  
+       font-weight: 200;  
+     }  
+     .name {
+     	color: #343333;
+     	font-size: 16px;
+     	font-weight: bold;
+      padding-left: 15px;
+     }
+     .errormsg {
+      color:red;
+      font-weight: bold;
+     }
+   </style>  
+   <apex:outputPanel styleClass="visualstrap">  
+     <apex:form >  
+     	<apex:outputPanel layout="block" styleClass="container" >
+     		<apex:outputPanel layout="block" styleClass="row"> 
+     			<apex:outputPanel layout="block">  
+            		<apex:outputPanel id="torender" layout="block" styleClass="well"> 
+            			<h3><span class="glyphicon glyphicon-cog"></span> Fitbit Application Settings</h3> <br/><br/>
+                   <apex:pageBlock rendered="{!NOT(showAuthButton)}" mode="maindetail">  
+					         	
+                    <apex:outputPanel layout="block" styleClass="row"><div class="name">Consumer Key</div><apex:outputPanel layout="block" styleClass="col-md-5"><apex:outputpanel layout="block" styleClass="requiredInput"><apex:outputpanel layout="block" styleClass="requiredBlock"/><apex:inputText styleClass="form-control" value="{!oAuthSetup.Consumer_Key__c}"/></apex:outputpanel><apex:outputText rendered="{!consumerKeyRequiredError}" styleClass="errormsg" value="Consumer Key is Required"/></apex:outputPanel></apex:outputPanel><br/>
+                    
+                    <apex:outputPanel layout="block" styleClass="row"><div class="name">Consumer Secret</div><apex:outputPanel layout="block" styleClass="col-md-5"><apex:outputpanel layout="block" styleClass="requiredInput"><apex:outputpanel layout="block" styleClass="requiredBlock"/><apex:inputText styleClass="form-control" size="50" value="{!oAuthSetup.Consumer_Secret__c}"/></apex:outputpanel><apex:outputText rendered="{!consumerSecretRequiredError}" styleClass="errormsg" value="Consumer Secret is Required"/></apex:outputPanel></apex:outputPanel><br/>
+
+                    <apex:outputPanel layout="block" styleClass="row"><div class="name">Request Token URL</div><apex:outputPanel layout="block" styleClass="col-md-5"><apex:outputpanel layout="block" styleClass="requiredInput"><apex:outputpanel layout="block" styleClass="requiredBlock"/><apex:inputText styleClass="form-control" size="50" value="{!oAuthSetup.Request_Token_URL__c}"/></apex:outputpanel><apex:outputText rendered="{!requestTokenRequiredError}" styleClass="errormsg" value="Request Token is Required"/></apex:outputPanel></apex:outputPanel><br/>
+
+                    <apex:outputPanel layout="block" styleClass="row"><div class="name">Access Token URL</div><apex:outputPanel layout="block" styleClass="col-md-5"><apex:outputpanel layout="block" styleClass="requiredInput"><apex:outputpanel layout="block" styleClass="requiredBlock"/><apex:inputText styleClass="form-control" size="50" value="{!oAuthSetup.Access_Token_URL__c}"/></apex:outputpanel><apex:outputText rendered="{!accessTokenRequiredError}" styleClass="errormsg" value="Access Token is Required"/></apex:outputPanel></apex:outputPanel><br/>
+
+                    <apex:outputPanel layout="block" styleClass="row"><div class="name">Authorization URL</div><apex:outputPanel layout="block" styleClass="col-md-5"><apex:outputpanel layout="block" styleClass="requiredInput"><apex:outputpanel layout="block" styleClass="requiredBlock"/><apex:inputText styleClass="form-control" size="50" value="{!oAuthSetup.Authorization_URL__c}"/></apex:outputpanel><apex:outputText rendered="{!authURLRequiredError}" styleClass="errormsg" value="Authorization URL is Required"/></apex:outputPanel></apex:outputPanel>
+
+					         </apex:pageBlock> 
+					         <apex:outputPanel rendered="{!NOT(showAuthButton)}" layout="block">  
+					           <apex:commandButton rerender="torender" value="Submit" styleClass="btn-success" action="{!saveSetupData}"/> 
+					         </apex:outputPanel> 
+					         <apex:outputPanel rendered="{!showAuthButton}" layout="block">  
+					           <apex:commandButton value="Authorize" styleClass="btn-success" action="{!authorize}"/>  
+					         </apex:outputPanel>
+            		</apex:outputPanel>  
+           		</apex:outputPanel>  
+           	</apex:outputPanel>
+       	</apex:outputPanel>    
+     </apex:form>  
+   </apex:outputPanel>  
+ </apex:page>

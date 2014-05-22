@@ -1,0 +1,172 @@
+<apex:page tabStyle="My_Fitbit_Profile__tab" title="My Fitbit Profile" sidebar="true" controller="MyFitbitProfileController" action="{!loadUserData}">
+	<chatter:feedWithFollowers rendered="{!NOT(ISNULL(fitbitGroupId))}" id="chatterfeed" entityid="{!fitbitGroupId}"/> 
+	<apex:form >
+		<apex:outputLink rendered="{!NOT(currentUserAuthed)}" value="/apex/AuthPage">Click Here if you would like to Authorize</apex:outputLink>
+		<p/>
+		<apex:outputPanel rendered="{!currentUserAuthed}">
+			<apex:outputText rendered="{!message!=null}" value="Problem: {!message}"/>
+			<apex:pageBlock mode="maindetail" title="My Profile">
+				<apex:pageBlockButtons location="top">
+					<apex:commandButton action="{!writeToChatterStatus}" value="Broadcast Your Results!!" rerender="chatterfeed"/>
+				</apex:pageBlockButtons>
+				<apex:pageMessages showDetail="true"/>
+				<apex:pageBlockSection columns="2">
+					<apex:pageBlockSectionItem >
+						<apex:outputLabel value="Profile Image" for="profileimage"/>
+						<apex:image id="profileimage" value="{!profileMap['user']['avatar']}" />
+					</apex:pageBlockSectionItem>
+					<apex:outputText value="{!profileMap['user']['fullName']}" label="Name"/>
+					<apex:outputText value="{!profileMap['user']['gender']}" label="Gender"/>
+					<apex:outputText value="{!profileMap['user']['dateOfBirth']}" label="Date Of Birth"/>
+				</apex:pageBlockSection>
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="My Device">
+				<apex:pageBlockSection columns="2">
+					<apex:outputText label="Battery Status" value="{!device.batteryStatus}"/>
+					<apex:outputText label="Device Version" value="{!device.deviceVersion}"/>
+					<apex:outputText label="Id" value="{!device.id}"/>
+					<apex:outputText label="Last Sync Time" value="{!device.lastSyncTime}"/>
+					<apex:outputText label="Device Type" value="{!device.deviceType}"/>
+				</apex:pageBlockSection>
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="My Badges">
+				<apex:repeat value="{!badgesMap['badges']}" var="badge1">
+					<apex:image id="profileimage" value="{!badge1['image75px']}" title="{!badge1['badgeType']}"/>
+				</apex:repeat>
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="My Activities Today">
+				<apex:pageBlockSection columns="2" title="Goals Reached">
+					<apex:pageBlockSectionItem >
+						<apex:outputLabel value="Steps" for="steps"/>
+						<apex:image id="steps" url="{!$Resource.GoldStar}" rendered="{!activitiesMap['summary']['steps'] >= activitiesMap['goals']['steps']}"/>
+					</apex:pageBlockSectionItem>
+					<apex:pageBlockSectionItem >
+						<apex:outputLabel value="Floors" for="floors"/>
+						<apex:image id="floors" url="{!$Resource.GoldStar}" rendered="{!activitiesMap['summary']['floors'] >= activitiesMap['goals']['floors']}"/>
+					</apex:pageBlockSectionItem>
+					<apex:pageBlockSectionItem >
+						<apex:outputLabel value="Calories Out" for="caloriesOut"/>
+						<apex:image id="caloriesOut" url="{!$Resource.GoldStar}" rendered="{!activitiesMap['summary']['caloriesOut'] >= activitiesMap['goals']['caloriesOut']}"/>
+					</apex:pageBlockSectionItem>												
+				</apex:pageBlockSection>
+				<apex:pageBlockSection columns="2" title="Goals">
+					<apex:outputText value="{!activitiesMap['goals']['distance']}" label="Distance"/>
+					<apex:outputText value="{!activitiesMap['goals']['steps']}" label="Steps"/>
+					<apex:outputText value="{!activitiesMap['goals']['floors']}" label="Floors"/>
+					<apex:outputText value="{!activitiesMap['goals']['caloriesOut']}" label="Calories Out"/>
+				</apex:pageBlockSection>
+				<apex:pageBlockSection columns="2" title="Summary">
+					<apex:outputText value="{!activitiesMap['summary']['fairlyActiveMinutes']}" label="Fairly Active Minutes"/>
+					<apex:outputText value="{!activitiesMap['summary']['marginalCalories']}" label="Marginal Calories"/>
+					<apex:outputText value="{!activitiesMap['summary']['floors']}" label="Floors"/>
+					<apex:outputText value="{!activitiesMap['summary']['elevation']}" label="Elevation"/>
+					<apex:outputText value="{!activitiesMap['summary']['sedentaryMinutes']}" label="Sedentary Minutes"/>
+					<apex:outputText value="{!activitiesMap['summary']['lightlyActiveMinutes']}" label="Lightly Active Minutes"/>
+					<apex:outputText value="{!activitiesMap['summary']['activityCalories']}" label="Activity Calories"/>
+					<apex:outputText value="{!activitiesMap['summary']['steps']}" label="Steps"/>
+					<apex:outputText value="{!activitiesMap['summary']['veryActiveMinutes']}" label="Very Active Minutes"/>
+					<apex:outputText value="{!activitiesMap['summary']['activeScore']}" label="Active Score"/>
+					<apex:outputText value="{!activitiesMap['summary']['caloriesOut']}" label="Calories Out"/>
+					<apex:pageBlockSectionItem >&nbsp;</apex:pageBlockSectionItem>
+					<apex:pageBlockTable value="{!activitiesMap['summary']['distances']}" var="summaryactivity">
+					    <apex:column value="{!summaryactivity['activity']}" headerValue="Activity"/>
+			    		<apex:column value="{!summaryactivity['distance']}" headerValue="Distance"/>
+					</apex:pageBlockTable>
+				</apex:pageBlockSection>
+				<apex:pageBlockSection columns="1" title="Activities">
+					<apex:pageBlockTable value="{!activitiesMap['activities']}" var="activity">
+					    <apex:column value="{!activity['activityId']}" headerValue="Activity Id"/>
+			    		<apex:column value="{!activity['startTime']}" headerValue="Start Time"/>
+			    		<apex:column value="{!activity['duration']}" headerValue="Duration"/>
+			    		<apex:column value="{!activity['logId']}" headerValue="Log Id"/>
+			    		<apex:column value="{!activity['description']}" headerValue="Description"/>
+			    		<apex:column value="{!activity['isFavorite']}" headerValue="Is Favorite"/>
+			    		<apex:column value="{!activity['name']}" headerValue="Name"/>
+			    		<apex:column value="{!activity['calories']}" headerValue="Calories"/>
+			    		<apex:column value="{!activity['hasStartTime']}" headerValue="Has Start Time"/>
+			    		<apex:column value="{!activity['activityParentId']}" headerValue="Activity Parent Id"/>
+			    		<apex:column value="{!activity['activityParentName']}" headerValue="Activity Parent Name"/>
+					</apex:pageBlockTable>
+				</apex:pageBlockSection>		
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="My Sleep Today">
+				<apex:pageBlockSection columns="1">
+					<apex:outputText value="{!sleepMap['summary']['totalMinutesAsleep']}" label="Total Minutes Asleep"/>
+					<apex:outputText value="{!sleepMap['summary']['totalSleepRecords']}" label="Total Sleep Records"/>
+					<apex:outputText value="{!sleepMap['summary']['totalTimeInBed']}" label="Total Time in Bed"/>
+				</apex:pageBlockSection>
+				<apex:pageBlockTable value="{!sleepMap['sleep']}" var="sleepitem">
+			    	<apex:column value="{!sleepitem['awakeningsCount']}" headerValue="Awakenings Count"/>
+			    	<apex:column value="{!sleepitem['duration']}" headerValue="Duration"/>
+			    	<apex:column value="{!sleepitem['efficiency']}" headerValue="Efficiency"/>
+			    	<apex:column value="{!sleepitem['isMainSleep']}" headerValue="Is Main Sleep"/>
+			    	<apex:column value="{!sleepitem['logId']}" headerValue="Log Id"/>
+			    	<apex:column value="{!sleepitem['minutesAfterWakeup']}" headerValue="Minutes After Wakeup"/>
+			    	<apex:column value="{!sleepitem['minutesAsleep']}" headerValue="Minutes Asleep"/>
+			    	<apex:column value="{!sleepitem['minutesAwake']}" headerValue="Minutes Awake"/>
+			    	<apex:column value="{!sleepitem['minutesToFallAsleep']}" headerValue="Minutes To Fall Asleep"/>
+			    	<apex:column value="{!sleepitem['startTime']}" headerValue="Start Time"/>
+			    	<apex:column value="{!sleepitem['timeInBed']}" headerValue="Time In Bed"/>		
+				</apex:pageBlockTable>
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="Sleep Over Time">
+				<apex:chart height="400" width="100%" data="{!mySleepingList}">
+			        <apex:axis minimum="0" type="Numeric" position="left" fields="eventValue" 
+			            title="Hours"/>
+			    	<apex:axis type="Category" position="bottom" fields="eventDate"/>
+			        <apex:barSeries colorSet="#C2FFA3" orientation="vertical" axis="left" 
+			            xField="eventDate" yField="eventValue">
+			            <apex:chartLabel display="insideEnd" field="eventValue" color="#333"/>
+			        </apex:barSeries>
+			    </apex:chart>
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="Calories Burned Over Time">
+				<apex:chart height="400" width="100%" data="{!myCaloriesList}">
+			        <apex:axis minimum="0" type="Numeric" position="left" fields="eventValue" 
+			            title="Calories Burned"/>
+			    	<apex:axis type="Category" position="bottom" fields="eventDate"/>
+			        <apex:barSeries colorSet="#FFD1F0" orientation="vertical" axis="left" 
+			            xField="eventDate" yField="eventValue">
+			            <apex:chartLabel display="insideEnd" field="eventValue" color="#333"/>
+			        </apex:barSeries>
+			    </apex:chart>
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="Steps Over Time">
+				<apex:chart height="400" width="100%" data="{!myStepsList}">
+			        <apex:axis minimum="0" type="Numeric" position="left" fields="eventValue" 
+			            title="Steps"/>
+			    	  <apex:axis type="Category" position="bottom" fields="eventDate"/>
+			        <apex:barSeries colorSet="#66E0FF" orientation="vertical" axis="left" 
+			            xField="eventDate" yField="eventValue">
+			            <apex:chartLabel display="insideEnd" field="eventValue" color="#333"/>
+			        </apex:barSeries>
+			    </apex:chart>
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="Distance Over Time">
+				<apex:chart height="400" width="100%" data="{!myDistanceList}">
+			        <apex:axis minimum="0" type="Numeric" position="left" fields="eventValue" 
+			            title="Distance in Miles"/>
+			    	<apex:axis type="Category" position="bottom" fields="eventDate"/>
+			        <apex:barSeries colorSet="#E6D6F7" orientation="vertical" axis="left" 
+			            xField="eventDate" yField="eventValue">
+			            <apex:chartLabel display="insideEnd" field="eventValue" color="#333"/>
+			        </apex:barSeries>
+			    </apex:chart>
+			</apex:pageBlock>
+			<apex:pageBlock mode="maindetail" title="Steps to Calories Comparison">
+				<apex:chart height="400" width="100%" data="{!activitesGraph}">
+			        <apex:legend position="right"/>
+			        <apex:axis minimum="0" type="Numeric" position="right" fields="steps"
+			            title="Steps"/>
+			       <apex:axis minimum="0" type="Numeric" position="left" fields="calories"
+			            title="Calories"/>
+			        <apex:axis type="Category" position="bottom" fields="eventDate"/>
+			        <apex:lineSeries title="Calories" axis="left"
+			            xField="eventDate" yField="calories"/>
+			        <apex:lineSeries title="Steps" axis="right" xField="eventDate" yField="steps"
+			            fill="false" markerType="cross" markerSize="4" markerFill="#FF0000"/>
+			    </apex:chart>
+		    </apex:pageBlock>
+		</apex:outputPanel>
+	</apex:form>
+</apex:page>
